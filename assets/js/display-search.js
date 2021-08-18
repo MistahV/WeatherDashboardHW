@@ -4,7 +4,7 @@ var searchInput = document.querySelector('#searchCity')
 var searchHistoryEl = document.querySelector('#searchedCities')
 
 
-showSearch();
+// showSearch();
 
 
 function handleSearchFormSubmit(event) {
@@ -18,11 +18,10 @@ function handleSearchFormSubmit(event) {
     return;
   }
 
-  searchApiWeather(searchInputVal);
+  searchApiWeather();
 
-  saveSearch();
+  // saveSearch();
 
-//set up local storage function to save search history?
 
 }
 
@@ -40,32 +39,41 @@ function handleSearchFormSubmit(event) {
 
 
 
-function searchApiWeather() {
-
-    var requestURLCity = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput.value}&appid=d6b1c98ae6030744047ac8cf7d9346ba`;
+function searchApiWeather(city) {
+  var search = searchInput.value
+  console.log(city)
+  if(city) {
+    search = city;
+  }
+    var requestURLCity = `https://api.openweathermap.org/data/2.5/weather?q=${search}&appid=d6b1c98ae6030744047ac8cf7d9346ba`;
       
+    if(!city) {
+      cityHistory.push(searchInput.value)
+      localStorage.setItem("cityHistory", JSON.stringify(cityHistory))
+    }
      fetch(requestURLCity)
         .then(response => response.json())
-        .then(data => {
-           let cityLon = (data.coord.lon);
-           let cityLat = (data.coord.lat);
+        .then(firstData => {
+           let cityLon = (firstData.coord.lon);
+           let cityLat = (firstData.coord.lat);
 
            console.log(cityLon);
            console.log(cityLat);
 
-           return fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${cityLon}&lon=${cityLat}&exclude=minutely,hourly&appid=d6b1c98ae6030744047ac8cf7d9346ba`)
+           fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${cityLat}&lon=${cityLon}&exclude=minutely,hourly&appid=d6b1c98ae6030744047ac8cf7d9346ba&units=imperial`)
               .then(response => response.json())
               .then(data => {
-                  let weatherInfo = (data.current);
-                  console.log(weatherInfo)
-
-                  return weatherInfo;
+                  // let weatherInfo = (data.current);
+                  // console.log(weatherInfo)
+                  console.log(data)
+                  showWeather(data, firstData.name)
+                  // weatherInfo;
               })
         })
  }
   
    
- 
+
  
   // fetch(requestUrlWeather)
   //   .then(response => response.json())
@@ -79,11 +87,15 @@ function searchApiWeather() {
   //   });
 
 
+function searchByBtn () {
+  sampleCity = this.textContent;
+  searchApiWeather(sampleCity)
+}
 
-// Need to pass weather info from API function into showWeather function
 
-function showWeather () {
-  
+function showWeather (weatherObj, cityName) {
+  resultContentEl.innerHTML = ''
+
   var resultCard = document.createElement('div');
   resultCard.classList.add('card', 'bg-light', 'text-dark', 'mb-3', 'p-3');
 
@@ -92,29 +104,42 @@ function showWeather () {
   resultCard.append(resultBody);
 
   var titleEl = document.createElement('h3');
-  titleEl.textContent = resultObj.title;
+  titleEl.textContent = cityName;
 
   var bodyContentEl = document.createElement('p');
-  bodyContentEl.innerHTML = 
+  bodyContentEl.textContent = `Temp: ${weatherObj.current.temp}`
   
 
   resultBody.append(titleEl, bodyContentEl);
 
   resultContentEl.append(resultCard);
+  showSearch()
 }
 
-function saveSearch() {
-   localStorage.setItem('City', searchInput.value)
+// function saveSearch() {
+//    localStorage.setItem('City', searchInput.value)
+// }
+
+var cityHistory = [];
+if(localStorage.getItem("cityHistory")){
+  cityHistory = JSON.parse(localStorage.getItem("cityHistory"))
 }
 
 function showSearch() {
-  let searchHistory = localStorage.getItem('City');
-  let cityButton = document.createElement('button')
-  searchHistoryEl.appendChild(cityButton);
-  cityButton.innerHTML = searchHistory;
+  // let searchHistory = localStorage.getItem('City');
+
+  searchHistoryEl.innerHTML = ""
+
+  cityHistory.forEach(index => {
+    let cityButton = document.createElement('button')
+    searchHistoryEl.appendChild(cityButton);
+    cityButton.textContent = index;
+    cityButton.addEventListener("click", searchByBtn)
+  })
+
 }
 
-
+showSearch()
 
 searchFormEl.addEventListener('submit', handleSearchFormSubmit);
 
