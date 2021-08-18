@@ -1,6 +1,10 @@
 var resultContentEl = document.querySelector('#cityWeather-container');
 var searchFormEl = document.querySelector('#user-form');
 var searchInput = document.querySelector('#searchCity')
+var searchHistoryEl = document.querySelector('#searchedCities')
+
+
+showSearch();
 
 
 function handleSearchFormSubmit(event) {
@@ -15,6 +19,11 @@ function handleSearchFormSubmit(event) {
   }
 
   searchApiWeather(searchInputVal);
+
+  saveSearch();
+
+//set up local storage function to save search history?
+
 }
 
 
@@ -31,14 +40,7 @@ function handleSearchFormSubmit(event) {
 
 
 
-
-   // One Call Weather API uses lon & lat coordinates for search...
-    
-    // So, use original API to get city coordinates from user search input, then pass those coordinates into One Call API
-    
-
 function searchApiWeather() {
-
 
     var requestURLCity = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput.value}&appid=d6b1c98ae6030744047ac8cf7d9346ba`;
       
@@ -78,10 +80,10 @@ function searchApiWeather() {
 
 
 
+// Need to pass weather info from API function into showWeather function
+
 function showWeather () {
   
-
-  // set up `<div>` to hold result content
   var resultCard = document.createElement('div');
   resultCard.classList.add('card', 'bg-light', 'text-dark', 'mb-3', 'p-3');
 
@@ -101,7 +103,16 @@ function showWeather () {
   resultContentEl.append(resultCard);
 }
 
+function saveSearch() {
+   localStorage.setItem('City', searchInput.value)
+}
 
+function showSearch() {
+  let searchHistory = localStorage.getItem('City');
+  let cityButton = document.createElement('button')
+  searchHistoryEl.appendChild(cityButton);
+  cityButton.innerHTML = searchHistory;
+}
 
 
 
