@@ -2,16 +2,16 @@ var resultContentEl = document.querySelector('#cityWeather-container');
 var searchFormEl = document.querySelector('#user-form');
 var searchInput = document.querySelector('#searchCity')
 var searchHistoryEl = document.querySelector('#searchedCities')
+var resultCard = document.querySelector('#weatherResult')
+var resultBody = document.querySelector('#resultBody')
 
 
-// showSearch();
 
 
 function handleSearchFormSubmit(event) {
   event.preventDefault();
  
   var searchInputVal = searchInput.value;
-  console.log(searchInputVal)
 
   if (!searchInputVal) {
     alert('You need to correctly enter a city name!');
@@ -20,22 +20,7 @@ function handleSearchFormSubmit(event) {
 
   searchApiWeather();
 
-  // saveSearch();
-
-
 }
-
-
-// function getParams() {
-//   // Get the search params out of the URL (i.e. `?q=london&format=photo`) and convert it to an array (i.e. ['?q=london', 'format=photo'])
-//   var searchParamsArr = document.location.search.split('&');
-
-//   // Get the query and format values
-//   var query = searchParamsArr[0].split('=').pop();
-//   var format = searchParamsArr[1].split('=').pop();
-
-//   searchApi(query, format);
-// }
 
 
 
@@ -57,35 +42,17 @@ function searchApiWeather(city) {
            let cityLon = (firstData.coord.lon);
            let cityLat = (firstData.coord.lat);
 
-           console.log(cityLon);
-           console.log(cityLat);
-
            fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${cityLat}&lon=${cityLon}&exclude=minutely,hourly&appid=d6b1c98ae6030744047ac8cf7d9346ba&units=imperial`)
               .then(response => response.json())
               .then(data => {
-                  // let weatherInfo = (data.current);
-                  // console.log(weatherInfo)
+                  
                   console.log(data)
                   showWeather(data, firstData.name)
-                  // weatherInfo;
+                  
               })
         })
  }
   
-   
-
- 
-  // fetch(requestUrlWeather)
-  //   .then(response => response.json())
-  //   .then(data => {
-  //      let weatherInfo = (data.results);
-  //      console.log(weatherInfo)
-  // })
-  
-  //   .catch(function (error) {
-  //     console.error(error);
-  //   });
-
 
 function searchByBtn () {
   sampleCity = this.textContent;
@@ -93,32 +60,52 @@ function searchByBtn () {
 }
 
 
+
 function showWeather (weatherObj, cityName) {
-  resultContentEl.innerHTML = ''
+  resultBody.innerHTML = ''
 
-  var resultCard = document.createElement('div');
-  resultCard.classList.add('card', 'bg-light', 'text-dark', 'mb-3', 'p-3');
+  // var resultCard = document.createElement('div');
+  // resultCard.classList.add('card');
 
-  var resultBody = document.createElement('div');
-  resultBody.classList.add('card-body');
-  resultCard.append(resultBody);
+  // var resultBody = document.createElement('div');
+  // resultBody.classList.add('card-body');
+  // resultCard.append(resultBody);
 
-  var titleEl = document.createElement('h3');
+  resultCard.setAttribute('style', 'display: block');
+
+
+  var titleEl = document.createElement('h2');
   titleEl.textContent = cityName;
 
-  var bodyContentEl = document.createElement('p');
-  bodyContentEl.textContent = `Temp: ${weatherObj.current.temp}`
+
+  var weatherConditionsEl = document.createElement('div')
+  let weatherIcon = weatherObj.current.weather[0].icon;
+  let weatherIconURL = `<img src=http://openweathermap.org/img/wn/${weatherIcon}.png>`;
+  console.log(weatherIconURL);
+  weatherConditionsEl.innerHTML = `Current weather: ${weatherIconURL}`
+
   
+  var tempContentEl = document.createElement('p');
+  tempContentEl.textContent = `Temp: ${weatherObj.current.temp}`;
 
-  resultBody.append(titleEl, bodyContentEl);
+  var humContentEl = document.createElement('p');
+  humContentEl.textContent = `Humidity: ${weatherObj.current.humidity}`;
 
-  resultContentEl.append(resultCard);
+  var windContentEl = document.createElement('p');
+  windContentEl.textContent = `Wind Speed: ${weatherObj.current.wind_speed}`;
+
+  var UVContentEl = document.createElement('p');
+  UVContentEl.textContent = `UV Index: ${weatherObj.current.uvi}`;
+  UVContentEl.className = 'UVIndex'
+
+
+  resultBody.append(titleEl, weatherConditionsEl, tempContentEl, humContentEl, windContentEl, UVContentEl);
+
+  // resultContentEl.append(resultCard);
   showSearch()
 }
 
-// function saveSearch() {
-//    localStorage.setItem('City', searchInput.value)
-// }
+
 
 var cityHistory = [];
 if(localStorage.getItem("cityHistory")){
@@ -126,7 +113,6 @@ if(localStorage.getItem("cityHistory")){
 }
 
 function showSearch() {
-  // let searchHistory = localStorage.getItem('City');
 
   searchHistoryEl.innerHTML = ""
 
@@ -143,4 +129,3 @@ showSearch()
 
 searchFormEl.addEventListener('submit', handleSearchFormSubmit);
 
-// getParams();
