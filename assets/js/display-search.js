@@ -2,8 +2,10 @@ var resultContentEl = document.querySelector('#cityWeather-container');
 var searchFormEl = document.querySelector('#user-form');
 var searchInput = document.querySelector('#searchCity')
 var searchHistoryEl = document.querySelector('#searchedCities')
-var resultCard = document.querySelector('#weatherResult')
-var resultBody = document.querySelector('#resultBody')
+var currentCard = document.querySelector('#currentWeather')
+var currentBody = document.querySelector('#currentBody')
+var fiveDayCard = document.querySelector('#fiveDayWeather')
+var fiveDayBody = document.querySelector('#fiveDayBody')
 
 
 
@@ -46,9 +48,7 @@ function searchApiWeather(city) {
               .then(response => response.json())
               .then(data => {
                   
-                  console.log(data)
                   showWeather(data, firstData.name)
-                  
               })
         })
  }
@@ -62,29 +62,22 @@ function searchByBtn () {
 
 
 function showWeather (weatherObj, cityName) {
-  resultBody.innerHTML = ''
+  
+  // Shows results for current weather
+  
+  currentBody.innerHTML = ''
 
-  // var resultCard = document.createElement('div');
-  // resultCard.classList.add('card');
-
-  // var resultBody = document.createElement('div');
-  // resultBody.classList.add('card-body');
-  // resultCard.append(resultBody);
-
-  resultCard.setAttribute('style', 'display: block');
-
+  currentCard.setAttribute('style', 'display: block');
 
   var titleEl = document.createElement('h2');
   titleEl.textContent = cityName;
-
 
   var weatherConditionsEl = document.createElement('div')
   let weatherIcon = weatherObj.current.weather[0].icon;
   let weatherIconURL = `<img src=http://openweathermap.org/img/wn/${weatherIcon}.png>`;
   console.log(weatherIconURL);
-  weatherConditionsEl.innerHTML = `Current weather: ${weatherIconURL}`
+  weatherConditionsEl.innerHTML = `Weather Conditions: ${weatherIconURL}`
 
-  
   var tempContentEl = document.createElement('p');
   tempContentEl.textContent = `Temp: ${weatherObj.current.temp}`;
 
@@ -98,10 +91,23 @@ function showWeather (weatherObj, cityName) {
   UVContentEl.textContent = `UV Index: ${weatherObj.current.uvi}`;
   UVContentEl.className = 'UVIndex'
 
+  currentBody.append(titleEl, weatherConditionsEl, tempContentEl, humContentEl, windContentEl, UVContentEl);
 
-  resultBody.append(titleEl, weatherConditionsEl, tempContentEl, humContentEl, windContentEl, UVContentEl);
 
-  // resultContentEl.append(resultCard);
+  // Shows results for five day weather forecast
+
+  fiveDayBody.innerHTML = ''
+
+  fiveDayCard.setAttribute('style', 'display: block');
+
+  console.log(weatherObj.daily[0].dt)
+  console.log(weatherObj.daily[0].temp.day)
+  console.log(weatherObj.daily[0].humidity)
+  console.log(weatherObj.daily[0].wind_speed)
+  console.log(weatherObj.daily[0].weather[0].icon)
+
+
+
   showSearch()
 }
 
@@ -120,6 +126,7 @@ function showSearch() {
     let cityButton = document.createElement('button')
     searchHistoryEl.appendChild(cityButton);
     cityButton.textContent = index;
+    cityButton.className = "cityButton";
     cityButton.addEventListener("click", searchByBtn)
   })
 
