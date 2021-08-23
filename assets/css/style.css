@@ -62,6 +62,7 @@
     background-color: var(--tertiary);
     transform: translate(0, 0);
     box-shadow: 2px 2px var(--dark);
+    cursor: pointer;
   }
   
   .btn-inline {
@@ -139,6 +140,14 @@
     margin-left: 15%;
     margin-bottom: 1%;
   }
+
+  .cityButton:hover {
+    color: var(--primary);
+    background-color: var(--tertiary);
+    transform: translate(0, 0);
+    box-shadow: 2px 2px var(--dark);
+    cursor:pointer;
+  }
   
   /* CARDS */
   .card {
@@ -161,19 +170,34 @@
   .currentWeather {
     margin-left: 20%;
     border: 3px solid var(--dark);
-    border-radius: var(--border-radius);
     width: 60%;
     padding: 2.5%;
     box-shadow: 0px 0px 14px 10px var(--secondary);
   }
 
   .fiveDayWeather {
-
+    margin-left: 20%;
+    margin-top: 5%;
+    border: 3px solid var(--tertiary);
+    width: 60%;
+    padding: 2.5%;
+    box-shadow: 0px 0px 14px 10px var(--dark);
   }
 
 
-  .UVIndex {
-    
+  .UVIndexSevere {
+    background-color: red;
+    width: fit-content;
+  }
+
+  .UVIndexModerate {
+    background-color: yellow;
+    width: fit-content;
+  }
+
+  .UVIndexFair {
+    background-color: greenyellow;
+    width: fit-content;
   }
   
   /* FORM */

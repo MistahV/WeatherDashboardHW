@@ -4,8 +4,8 @@ var searchInput = document.querySelector('#searchCity')
 var searchHistoryEl = document.querySelector('#searchedCities')
 var currentCard = document.querySelector('#currentWeather')
 var currentBody = document.querySelector('#currentBody')
-var fiveDayCard = document.querySelector('#fiveDayWeather')
-var fiveDayBody = document.querySelector('#fiveDayBody')
+var fiveDayWeather = document.querySelector('#fiveDayWeather-container')
+var fiveDayCard = document.querySelector('#fiveDayCard')
 
 
 
@@ -63,6 +63,13 @@ function searchByBtn () {
 
 function showWeather (weatherObj, cityName) {
   
+  // convert Unix time to date stamp
+
+  const unixTime = weatherObj.current.dt;
+  const timeMillisecs = unixTime * 1000;
+  const currentDateObj = new Date(timeMillisecs);
+  const currentDate = currentDateObj.toLocaleString("en-US", {timeZoneName: "short"});
+
   // Shows results for current weather
   
   currentBody.innerHTML = ''
@@ -70,12 +77,14 @@ function showWeather (weatherObj, cityName) {
   currentCard.setAttribute('style', 'display: block');
 
   var titleEl = document.createElement('h2');
-  titleEl.textContent = cityName;
+  titleEl.textContent = `${cityName} (current)`;
+
+  var dateEl = document.createElement('p');
+  dateEl.textContent = currentDate
 
   var weatherConditionsEl = document.createElement('div')
   let weatherIcon = weatherObj.current.weather[0].icon;
   let weatherIconURL = `<img src=http://openweathermap.org/img/wn/${weatherIcon}.png>`;
-  console.log(weatherIconURL);
   weatherConditionsEl.innerHTML = `Weather Conditions: ${weatherIconURL}`
 
   var tempContentEl = document.createElement('p');
@@ -89,24 +98,64 @@ function showWeather (weatherObj, cityName) {
 
   var UVContentEl = document.createElement('p');
   UVContentEl.textContent = `UV Index: ${weatherObj.current.uvi}`;
-  UVContentEl.className = 'UVIndex'
+  if (weatherObj.current.uvi < 3) {
+     UVContentEl.className = 'UVIndexFair'
+  } else if (weatherObj.current.uvi >= 3 && weatherObj.current.uvi < 6) {
+     UVContentEl.className = 'UVIndexModerate'
+  } else {
+     UVContentEl.className = 'UVIndexSevere'
+  };
 
-  currentBody.append(titleEl, weatherConditionsEl, tempContentEl, humContentEl, windContentEl, UVContentEl);
+  
+  currentBody.append(titleEl, dateEl, weatherConditionsEl, tempContentEl, humContentEl, windContentEl, UVContentEl);
 
 
   // Shows results for five day weather forecast
+  
+  // fiveDayWeather.innerHTML('');
+ 
+  fiveDayCard.setAttribute('style', 'display: block;')
 
-  fiveDayBody.innerHTML = ''
+  weatherObj.daily.forEach(
+    day => {
+      
+      var dailyCard = document.createElement('div');
+      dailyCard.className = 'fiveDayWeather';
 
-  fiveDayCard.setAttribute('style', 'display: block');
+      var dailyDateObj = new Date(day.dt*1000)
+      var dailyDate = dailyDateObj.toLocaleString("en-US", {timeZoneName: "short"})
+      var dailyDateEl = document.createElement('p');
+      dailyDateEl.textContent = `Future weather for ${cityName} on ${dailyDate}`;
 
-  console.log(weatherObj.daily[0].dt)
-  console.log(weatherObj.daily[0].temp.day)
-  console.log(weatherObj.daily[0].humidity)
-  console.log(weatherObj.daily[0].wind_speed)
-  console.log(weatherObj.daily[0].weather[0].icon)
+      var fiveDayWeatherConditionsEl = document.createElement('div')
+      let fiveDayWeatherIcon = day.weather[0].icon
+      let fiveDayWeatherIconURL = `<img src=http://openweathermap.org/img/wn/${fiveDayWeatherIcon}.png>`;
+      fiveDayWeatherConditionsEl.innerHTML = `Weather Conditions: ${fiveDayWeatherIconURL}`
 
+      var fiveDayTemp = document.createElement('p');
+      fiveDayTemp.textContent = `Predicted Temp: ${day.temp.day}`;
 
+      var fiveDayHum = document.createElement('p');
+      fiveDayHum.textContent = `Predicted Humidity: ${day.humidity}`;
+
+      var fiveDayWind = document.createElement('p');
+      fiveDayWind.textContent = `Predicted Wind Speed: ${day.wind_speed}`;
+
+      var fiveDayUVContentEl = document.createElement('p');
+      fiveDayUVContentEl.textContent = `UV Index: ${day.uvi}`;
+        if (day.uvi < 3) {
+           fiveDayUVContentEl.className = 'UVIndexFair'
+        } else if (day.uvi >= 3 && day.uvi < 6) {
+           fiveDayUVContentEl.className = 'UVIndexModerate'
+        } else {
+           fiveDayUVContentEl.className = 'UVIndexSevere'
+        };
+      
+      dailyCard.append(dailyDateEl, fiveDayWeatherConditionsEl, fiveDayTemp, fiveDayHum, fiveDayWind, fiveDayUVContentEl);
+
+      fiveDayCard.append(dailyCard);
+    }
+  )
 
   showSearch()
 }
