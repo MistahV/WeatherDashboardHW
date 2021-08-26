@@ -20,6 +20,7 @@ function handleSearchFormSubmit(event) {
     return;
   }
 
+  
   searchApiWeather();
 
 }
@@ -112,40 +113,41 @@ function showWeather (weatherObj, cityName) {
 
   // Shows results for five day weather forecast
   
-  // fiveDayWeather.innerHTML('');
  
   fiveDayCard.setAttribute('style', 'display: block;')
+  fiveDayCard.innerHTML = ""
+  
+  let day = weatherObj.daily
+  for(i=1; i<=5; i++) {
+    console.log(day[i])
 
-  weatherObj.daily.forEach(
-    day => {
-      
-      var dailyCard = document.createElement('div');
+    var dailyCard = document.createElement('div');
       dailyCard.className = 'fiveDayWeather';
 
-      var dailyDateObj = new Date(day.dt*1000)
+      var dailyDateObj = new Date(day[i].dt*1000)
       var dailyDate = dailyDateObj.toLocaleString("en-US", {timeZoneName: "short"})
       var dailyDateEl = document.createElement('p');
       dailyDateEl.textContent = `Future weather for ${cityName} on ${dailyDate}`;
 
       var fiveDayWeatherConditionsEl = document.createElement('div')
-      let fiveDayWeatherIcon = day.weather[0].icon
+      let fiveDayWeatherIcon = day[i].weather.icon
       let fiveDayWeatherIconURL = `<img src=http://openweathermap.org/img/wn/${fiveDayWeatherIcon}.png>`;
       fiveDayWeatherConditionsEl.innerHTML = `Weather Conditions: ${fiveDayWeatherIconURL}`
 
       var fiveDayTemp = document.createElement('p');
-      fiveDayTemp.textContent = `Predicted Temp: ${day.temp.day}`;
+      fiveDayTemp.textContent = `Predicted Temp: ${day[i].temp.day}`;
 
       var fiveDayHum = document.createElement('p');
-      fiveDayHum.textContent = `Predicted Humidity: ${day.humidity}`;
+      fiveDayHum.textContent = `Predicted Humidity: ${day[i].humidity}`;
 
       var fiveDayWind = document.createElement('p');
-      fiveDayWind.textContent = `Predicted Wind Speed: ${day.wind_speed}`;
+      fiveDayWind.textContent = `Predicted Wind Speed: ${day[i].wind_speed}`;
 
       var fiveDayUVContentEl = document.createElement('p');
-      fiveDayUVContentEl.textContent = `UV Index: ${day.uvi}`;
-        if (day.uvi < 3) {
+      fiveDayUVContentEl.textContent = `UV Index: ${day[i].uvi}`;
+        if (day[i].uvi < 3) {
            fiveDayUVContentEl.className = 'UVIndexFair'
-        } else if (day.uvi >= 3 && day.uvi < 6) {
+        } else if (day[i].uvi >= 3 && day.uvi < 6) {
            fiveDayUVContentEl.className = 'UVIndexModerate'
         } else {
            fiveDayUVContentEl.className = 'UVIndexSevere'
@@ -155,7 +157,14 @@ function showWeather (weatherObj, cityName) {
 
       fiveDayCard.append(dailyCard);
     }
-  )
+
+
+  
+  // weatherObj.daily.forEach(
+  //   day => {
+      
+      
+  // )
 
   showSearch()
 }
